@@ -47,7 +47,7 @@ public abstract class CLIApplication {
 					command.execute(values);
 				}catch(ParsingException e){
 					System.err.println("Error parsing command: "+e.getMessage());
-					System.err.println("Please type '"+this.getApplicationCommand()+" help "+command.getName()+"' for more info");
+					printCommandHelp(command);
 				}catch(Exception e){
 					System.err.println("Error during execution: "+e.getMessage());
 					e.printStackTrace();
