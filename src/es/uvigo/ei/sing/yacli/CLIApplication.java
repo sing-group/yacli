@@ -4,7 +4,6 @@ package es.uvigo.ei.sing.yacli;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class CLIApplication {
 
@@ -23,6 +22,7 @@ public abstract class CLIApplication {
 			return (parameters.get(option)==null)?null:parameters.get(option).toString();
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public List<String> getAllValues(Option option) {
 			if (!option.isMultiple()){
@@ -145,6 +145,7 @@ public abstract class CLIApplication {
 				}else{
 					if (values.containsKey(currentOption)){
 						if (currentOption.isMultiple()){
+							@SuppressWarnings("unchecked")
 							List<String> valuesList = (List<String>) values.get(currentOption);
 							valuesList.add(token);
 						}else{

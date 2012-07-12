@@ -3,7 +3,6 @@ package es.uvigo.ei.sing.yacli;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractCommand implements Command {
 

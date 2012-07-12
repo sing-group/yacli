@@ -2,7 +2,6 @@ package es.uvigo.ei.sing.yacli;
 
 
 import java.util.List;
-import java.util.Map;
 
 public interface Command {
 
