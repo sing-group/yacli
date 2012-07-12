@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class CLIApplication {
 
-	public class DefaultParameters implements Parameters {
+	private class DefaultParameters implements Parameters {
 		
 		private HashMap<Option, Object> parameters;
 		public DefaultParameters(HashMap<Option, Object> values) {
