@@ -10,7 +10,7 @@ public interface Command {
 	public String getDescription();
 	public List<Option> getOptions();
 	
-	public void execute(Map<Option, String> parameters) throws Exception;
+	public void execute(Map<Option, Object> parameters) throws Exception;
 	
 	
 }

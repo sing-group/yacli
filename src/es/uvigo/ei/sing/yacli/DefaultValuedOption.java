@@ -7,7 +7,7 @@ public final class DefaultValuedOption extends Option {
 
 	public DefaultValuedOption(String paramName, String shortName,
 			String description, String defaultValue) {		
-		super(paramName, shortName, description, true, true);
+		super(paramName, shortName, description, true, true, false);
 		this.defaultValue = defaultValue;
 		
 	}

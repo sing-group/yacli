@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.yacli;
 
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class CLIApplication {
@@ -43,7 +44,7 @@ public abstract class CLIApplication {
 				String[] noFirst = new String[args.length-1];
 				System.arraycopy(args, 1, noFirst, 0, noFirst.length);
 				try{
-					HashMap<Option, String> values = parseCommand(command, noFirst);
+					HashMap<Option, Object> values = parseCommand(command, noFirst);
 					command.execute(values);
 				}catch(ParsingException e){
 					System.err.println("Error parsing command: "+e.getMessage());
@@ -69,8 +70,8 @@ public abstract class CLIApplication {
 		return null;			
 	}
 	
-	private HashMap<Option, String> parseCommand(Command command, String[] arguments) throws ParsingException {
-		HashMap<Option, String> values = new HashMap<Option, String>();
+	private HashMap<Option, Object> parseCommand(Command command, String[] arguments) throws ParsingException {
+		HashMap<Option, Object> values = new HashMap<Option, Object>();
 		
 		command.getOptions();
 		Option currentOption = null;
@@ -103,9 +104,20 @@ public abstract class CLIApplication {
 					throw new ParsingException("unable to parse. You should specify an option before a value");
 				}else{
 					if (values.containsKey(currentOption)){
-						throw new ParsingException("option "+currentOption.getParamName()+" was already specified");
+						if (currentOption.isMultiple()){
+							List<String> valuesList = (List<String>) values.get(currentOption);
+							valuesList.add(token);
+						}else{
+							throw new ParsingException("option "+currentOption.getParamName()+" was already specified");
+						}
 					}else{
-						values.put(currentOption, token);
+						if (currentOption.isMultiple()){
+							List<String> valuesList = new LinkedList<String>();
+							valuesList.add(token);
+							values.put(currentOption, valuesList);
+						}else{
+							values.put(currentOption, token);
+						}
 					}
 				}
 			}
@@ -138,7 +150,8 @@ public abstract class CLIApplication {
 			System.err.println(
 					"\t--"+option.getParamName()+"/-"+option.getShortName()
 					+"\n\t\t"+option.getDescription()
-					+((option instanceof DefaultValuedOption)?" (default: "+((DefaultValuedOption)option).getDefaultValue()+")":""));
+					+((option instanceof DefaultValuedOption)?" (default: "+((DefaultValuedOption)option).getDefaultValue()+")":"")
+					+((option.isMultiple())?". This option can be specified multiple times":""));
 		}		
 	}
 	
