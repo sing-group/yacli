@@ -4,9 +4,48 @@ package es.uvigo.ei.sing.yacli;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class CLIApplication {
 
+	public class DefaultParameters implements Parameters {
+		
+		private HashMap<Option, Object> parameters;
+		public DefaultParameters(HashMap<Option, Object> values) {
+			this.parameters = values;
+		}
+
+		@Override
+		public String getSingleValue(Option option) {
+			if (option.isMultiple()){
+				throw new IllegalArgumentException("Option "+option.getParamName()+"/"+option.getShortName()+" is multiple. Use getAllValues, instead");
+			}
+			return (parameters.get(option)==null)?null:parameters.get(option).toString();
+		}
+
+		@Override
+		public List<String> getAllValues(Option option) {
+			if (!option.isMultiple()){
+				throw new IllegalArgumentException("Option "+option.getParamName()+"/"+option.getShortName()+" is not multiple. Use getSingleValue, instead");
+			}
+			return (List<String>) parameters.get(option);
+	
+		}
+
+		@Override
+		public boolean hasFlag(Option option) {
+			if (option.requiresValue()){
+				throw new IllegalArgumentException("Option "+option.getParamName()+"/"+option.getShortName()+" is not a flag. Use getSingleValue, instead");
+			}
+			return parameters.containsKey(option);
+		}
+
+		@Override
+		public boolean hasOption(Option option) {
+			return parameters.containsKey(option);
+		}
+
+	}
 	protected List<Command> commands = buildCommands();
 	private HashMap<String, Command> commandsByName = new HashMap<String, Command>();
 	protected abstract List<Command> buildCommands(); //factory method
@@ -45,7 +84,8 @@ public abstract class CLIApplication {
 				System.arraycopy(args, 1, noFirst, 0, noFirst.length);
 				try{
 					HashMap<Option, Object> values = parseCommand(command, noFirst);
-					command.execute(values);
+					Parameters parameters = new DefaultParameters(values);
+					command.execute(parameters);
 				}catch(ParsingException e){
 					System.err.println("Error parsing command: "+e.getMessage());
 					printCommandHelp(command);

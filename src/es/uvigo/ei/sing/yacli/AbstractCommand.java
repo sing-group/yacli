@@ -27,37 +27,6 @@ public abstract class AbstractCommand implements Command {
 		}
 		return null;			
 	}
-	protected String getSingleValue(Map<Option, Object> parameters, String optionName){
-		Option o = findOption(optionName);
-		if (o.isMultiple()){
-			throw new IllegalArgumentException("Option "+optionName+" is multiple. Use getAllValues, instead");
-		}
-		return (parameters.get(o)==null)?null:parameters.get(o).toString();
-	}
-	
-	protected List<String> getAllValues(Map<Option, Object> parameters, String optionName){
-		Option o = findOption(optionName);
-		if (!o.isMultiple()){
-			throw new IllegalArgumentException("Option "+optionName+" is not multiple. Use getSingleValue, instead");
-		}
-		return (List<String>) parameters.get(o);
-	}
-	
-	protected boolean hasFlag(Map<Option, Object> parameters, String optionName){
-		Option o = findOption(optionName);
-		if (o.requiresValue()){
-			throw new IllegalArgumentException("Option "+optionName+" is not a flag. Use getSingleValue, instead");
-		}
-		return parameters.containsKey(o);
-		
-	}
-	
-	protected boolean hasOption(Map<Option, Object> parameters, String optionName){
-		Option o = findOption(optionName);		
-		return parameters.containsKey(o);
-		
-	}
-	
 	protected abstract List<Option> createOptions(); //factory method
 
 }
