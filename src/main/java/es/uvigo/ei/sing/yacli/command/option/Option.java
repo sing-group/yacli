@@ -1,5 +1,8 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
+import es.uvigo.ei.sing.yacli.command.parameter.MultipleParameterValue;
+import es.uvigo.ei.sing.yacli.command.parameter.ParameterValue;
+import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
 public class Option<T> {
 	private final String paramName;
@@ -73,6 +76,16 @@ public class Option<T> {
 				this.shortName.equalsIgnoreCase(name);
 	}
 
+	public boolean canConvert(ParameterValue<?> value) {
+		if (value instanceof SingleParameterValue) {
+			return this.getConverter().canConvert((SingleParameterValue) value);
+		} else if (value instanceof MultipleParameterValue) {
+			return this.getConverter().canConvert((MultipleParameterValue) value);
+		} else {
+			return false;
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return this.getShortName();
