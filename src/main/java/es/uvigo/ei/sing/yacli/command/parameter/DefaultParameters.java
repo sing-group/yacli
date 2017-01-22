@@ -1,5 +1,6 @@
 package es.uvigo.ei.sing.yacli.command.parameter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -109,5 +110,10 @@ public class DefaultParameters implements Parameters {
 	@Override
 	public boolean hasOption(Option<?> option) {
 		return optionValues.containsKey(option);
+	}
+	
+	@Override
+	public List<Option<?>> listOptions() {
+		return new ArrayList<>(this.optionValues.keySet());
 	}
 }

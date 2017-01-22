@@ -16,4 +16,6 @@ public interface Parameters {
 	public boolean hasFlag(Option<?> option);
 
 	public boolean hasOption(Option<?> option);
+	
+	public List<Option<?>> listOptions();
 }
