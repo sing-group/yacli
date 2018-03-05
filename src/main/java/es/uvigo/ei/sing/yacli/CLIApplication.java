@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import es.uvigo.ei.sing.yacli.command.Command;
+import es.uvigo.ei.sing.yacli.command.option.DefaultValuedOption;
+import es.uvigo.ei.sing.yacli.command.option.Option;
+import es.uvigo.ei.sing.yacli.command.parameter.Parameters;
+
 public abstract class CLIApplication {
 
 	private class DefaultParameters implements Parameters {

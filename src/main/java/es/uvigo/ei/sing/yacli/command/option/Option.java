@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.yacli;
+package es.uvigo.ei.sing.yacli.command.option;
 
 
 public class Option {

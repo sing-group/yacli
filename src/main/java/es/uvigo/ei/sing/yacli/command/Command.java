@@ -1,7 +1,10 @@
-package es.uvigo.ei.sing.yacli;
+package es.uvigo.ei.sing.yacli.command;
 
 
 import java.util.List;
+
+import es.uvigo.ei.sing.yacli.command.option.Option;
+import es.uvigo.ei.sing.yacli.command.parameter.Parameters;
 
 public interface Command {
 

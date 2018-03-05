@@ -1,8 +1,10 @@
-package es.uvigo.ei.sing.yacli;
+package es.uvigo.ei.sing.yacli.command;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import es.uvigo.ei.sing.yacli.command.option.Option;
 
 public abstract class AbstractCommand implements Command {
 
