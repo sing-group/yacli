@@ -1,22 +1,24 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
 
-public class Option {
-
-	private String paramName;
-	private String shortName;
-	private String description;
-	private boolean optional;
-	private boolean requiresValue;
-	private boolean isMultiple;
+public class Option<T> {
+	private final String paramName;
+	private final String shortName;
+	private final String description;
+	private final boolean optional;
+	private final boolean requiresValue;
+	private final boolean isMultiple;
+	private final OptionConverter<T> converter;
 
 	public Option(
-			String paramName, 
-			String shortName, 
+			String paramName,
+			String shortName,
 			String description,
-			boolean optional, 
+			boolean optional,
 			boolean requiresValue,
-			boolean isMultiple) {
+			boolean isMultiple,
+			OptionConverter<T> converter
+	) {
 		super();
 		this.paramName = paramName;
 		this.shortName = shortName;
@@ -24,16 +26,20 @@ public class Option {
 		this.optional = optional;
 		this.requiresValue = requiresValue;
 		this.isMultiple = isMultiple;
+		this.converter = converter;
 	}
 
 	public Option(
-			String paramName, 
-			String shortName, 
+			String paramName,
+			String shortName,
 			String description,
-			boolean optional, 
-			boolean requiresValue) {
-		this(paramName, shortName, description, optional, requiresValue, false);
+			boolean optional,
+			boolean requiresValue,
+			OptionConverter<T> converter
+	) {
+		this(paramName, shortName, description, optional, requiresValue, false, converter);
 	}
+
 	public String getParamName() {
 		return paramName;
 	}
@@ -53,11 +59,22 @@ public class Option {
 	public boolean requiresValue() {
 		return requiresValue;
 	}
-	
+
 	public boolean isMultiple() {
 		return isMultiple;
 	}
-	
-	
 
+	public OptionConverter<T> getConverter() {
+		return converter;
+	}
+
+	public boolean hasName(String name) {
+		return this.paramName.equalsIgnoreCase(name) ||
+				this.shortName.equalsIgnoreCase(name);
+	}
+
+	@Override
+	public String toString() {
+		return this.getShortName();
+	}
 }
