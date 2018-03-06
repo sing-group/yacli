@@ -17,13 +17,14 @@ public abstract class AbstractCommand implements Command {
 		return Collections.unmodifiableList(options);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public Option<?> getOption(String name) {
+	public <T> Option<T> getOption(String name) {
 		for (Option<?> option : this.getOptions()) {
 			if (option.hasName(name))
-				return option;
+				return (Option<T>) option;
 		}
-		
+
 		return null;
 	}
 

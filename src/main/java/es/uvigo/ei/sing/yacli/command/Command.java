@@ -14,7 +14,7 @@ public interface Command {
 
 	public List<Option<?>> getOptions();
 	
-	public Option<?> getOption(String name);
+	public <T> Option<T> getOption(String name);
 
 	public void execute(Parameters parameters) throws Exception;
 }
