@@ -22,19 +22,24 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class BigDecimalOption extends DefaultValuedStringConstructedOption<BigDecimal> {
-	public BigDecimalOption(
-		String paramName, String shortName,
-		String description, BigDecimal defaultValue
-	) {
+	public BigDecimalOption(String paramName, String shortName, String description, BigDecimal defaultValue) {
 		super(paramName, shortName, description, defaultValue.toPlainString());
 	}
-	
-	public BigDecimalOption(
-		String paramName, String shortName,
-		String description, String defaultValue
-	) {
+
+	public BigDecimalOption(String paramName, String shortName, String description, String defaultValue) {
 		this(paramName, shortName, description, new BigDecimal(defaultValue));
+	}
+
+	public BigDecimalOption(List<OptionCategory> categories, String paramName, String shortName, String description,
+			BigDecimal defaultValue) {
+		super(categories, paramName, shortName, description, defaultValue.toPlainString());
+	}
+
+	public BigDecimalOption(List<OptionCategory> categories, String paramName, String shortName, String description,
+			String defaultValue) {
+		this(categories, paramName, shortName, description, new BigDecimal(defaultValue));
 	}
 }

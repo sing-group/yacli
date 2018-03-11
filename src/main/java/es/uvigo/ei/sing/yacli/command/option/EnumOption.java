@@ -21,54 +21,57 @@
  */
 package es.uvigo.ei.sing.yacli.command.option;
 
+import java.util.List;
+
 import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
 public class EnumOption<T extends Enum<T>> extends DefaultValuedOption<T> {
-	public EnumOption(
-		String paramName, String shortName,
-		String description, T defaultValue
-	) {
-		super(paramName, shortName, description, defaultValue.name(), 
-			new EnumConverter<T>(defaultValue.getDeclaringClass())
-		);
+	public EnumOption(String paramName, String shortName, String description, T defaultValue) {
+		super(paramName, shortName, description, defaultValue.name(),
+				new EnumConverter<T>(defaultValue.getDeclaringClass()));
 	}
-	
-	public EnumOption(
-		String paramName, String shortName,
-		String description, Class<T> enumType, String defaultValue
-	) {
+
+	public EnumOption(String paramName, String shortName, String description, Class<T> enumType, String defaultValue) {
 		super(paramName, shortName, description, defaultValue, new EnumConverter<T>(enumType));
 	}
-	
-	public EnumOption(
-		String paramName, String shortName, 
-		String description, T defaultValue,
-		boolean optional, boolean requiresValue, boolean isMultiple
-	) {
-		super(
-			paramName, shortName, 
-			description, defaultValue.name(), 
-			optional, requiresValue, isMultiple, 
-			new EnumConverter<T>(defaultValue.getDeclaringClass())
-		);
+
+	public EnumOption(String paramName, String shortName, String description, T defaultValue, boolean optional,
+			boolean requiresValue, boolean isMultiple) {
+		super(paramName, shortName, description, defaultValue.name(), optional, requiresValue, isMultiple,
+				new EnumConverter<T>(defaultValue.getDeclaringClass()));
 	}
-	
-	public EnumOption(
-		String paramName, String shortName, 
-		String description, Class<T> enumType, String defaultValue, 
-		boolean optional, boolean requiresValue, boolean isMultiple
-	) {
-		super(
-			paramName, shortName, 
-			description, defaultValue, 
-			optional, requiresValue, isMultiple, 
-			new EnumConverter<T>(enumType)
-		);
+
+	public EnumOption(String paramName, String shortName, String description, Class<T> enumType, String defaultValue,
+			boolean optional, boolean requiresValue, boolean isMultiple) {
+		super(paramName, shortName, description, defaultValue, optional, requiresValue, isMultiple,
+				new EnumConverter<T>(enumType));
+	}
+
+	public EnumOption(List<OptionCategory> categories, String paramName, String shortName, String description, T defaultValue) {
+		super(categories, paramName, shortName, description, defaultValue.name(),
+				new EnumConverter<T>(defaultValue.getDeclaringClass()));
+	}
+
+	public EnumOption(List<OptionCategory> categories, String paramName, String shortName, String description,
+			Class<T> enumType, String defaultValue) {
+		super(categories, paramName, shortName, description, defaultValue, new EnumConverter<T>(enumType));
+	}
+
+	public EnumOption(List<OptionCategory> categories, String paramName, String shortName, String description, T defaultValue,
+			boolean optional, boolean requiresValue, boolean isMultiple) {
+		super(categories, paramName, shortName, description, defaultValue.name(), optional, requiresValue, isMultiple,
+				new EnumConverter<T>(defaultValue.getDeclaringClass()));
+	}
+
+	public EnumOption(List<OptionCategory> categories, String paramName, String shortName, String description,
+			Class<T> enumType, String defaultValue, boolean optional, boolean requiresValue, boolean isMultiple) {
+		super(categories, paramName, shortName, description, defaultValue, optional, requiresValue, isMultiple,
+				new EnumConverter<T>(enumType));
 	}
 
 	private final static class EnumConverter<E extends Enum<E>> extends AbstractOptionConverter<E> {
 		private final Class<E> enumType;
-		
+
 		public EnumConverter(Class<E> enumType) {
 			this.enumType = enumType;
 		}

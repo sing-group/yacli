@@ -1,16 +1,18 @@
 package es.uvigo.ei.sing.yacli;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import es.uvigo.ei.sing.yacli.command.Command;
 import es.uvigo.ei.sing.yacli.command.option.DefaultValuedOption;
 import es.uvigo.ei.sing.yacli.command.option.Option;
+import es.uvigo.ei.sing.yacli.command.option.OptionCategory;
 import es.uvigo.ei.sing.yacli.command.parameter.DefaultParameters;
 import es.uvigo.ei.sing.yacli.command.parameter.MultipleParameterValue;
 import es.uvigo.ei.sing.yacli.command.parameter.ParameterValue;
@@ -19,61 +21,63 @@ import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
 public abstract class CLIApplication {
 	private final Map<String, Command> commandsByName;
-	
-	protected abstract List<Command> buildCommands(); //factory method
+
+	protected abstract List<Command> buildCommands(); // factory method
+
 	protected abstract String getApplicationName();
+
 	protected abstract String getApplicationCommand();
-	
+
 	private boolean showApplicationCommandInHelp;
-	
+
 	public CLIApplication() {
 		this(true, true);
 	}
-	
+
 	public CLIApplication(boolean showApplicationCommandInHelp) {
 		this(showApplicationCommandInHelp, true);
 	}
-	
+
 	protected CLIApplication(boolean showApplicationCommandInHelp, boolean preloadCommands) {
 		this.showApplicationCommandInHelp = showApplicationCommandInHelp;
 		this.commandsByName = new LinkedHashMap<>();
-		
+
 		if (preloadCommands) {
 			this.loadCommands();
 		}
 	}
-	
+
 	protected void loadCommands() {
-		for (Command c : buildCommands()){
+		for (Command c : buildCommands()) {
 			commandsByName.put(c.getName().toUpperCase(), c);
-		}		
+		}
 	}
-	
+
 	protected List<Command> listCommands() {
 		return new ArrayList<>(this.commandsByName.values());
 	}
-	
+
 	public boolean isShowApplicationCommandInHelp() {
 		return showApplicationCommandInHelp;
 	}
-	
+
 	public void setShowApplicationCommandInHelp(boolean showApplicationCommandInHelp) {
 		this.showApplicationCommandInHelp = showApplicationCommandInHelp;
 	}
-	
+
 	protected String getDescription() {
 		return "";
 	}
-	
-	public void run(String[] args){
+
+	public void run(String[] args) {
 		if (args.length == 0) {
 			printHelp();
 		} else if (args[0].equalsIgnoreCase("help")) {
 			printWelcome();
-			
+
 			if (args.length >= 2) {
 				final Command command = commandsByName.get(args[1].toUpperCase());
-				
+
 				if (command != null)
 					printCommandHelp(command);
 				else {
@@ -87,10 +91,10 @@ public abstract class CLIApplication {
 			if (command != null) {
 				final String[] noFirst = new String[args.length - 1];
 				System.arraycopy(args, 1, noFirst, 0, noFirst.length);
-				
+
 				try {
 					final Map<Option<?>, ParameterValue<?>> values = parseCommand(command, noFirst);
-					
+
 					final Parameters parameters = new DefaultParameters(values);
 					command.execute(parameters);
 				} catch (ParsingException e) {
@@ -102,50 +106,44 @@ public abstract class CLIApplication {
 				}
 			} else {
 				System.err.println("Command " + args[0] + " not found");
-				
+
 				printHelp();
 			}
 
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private Map<Option<?>, ParameterValue<?>> parseCommand(Command command, String[] arguments)
-	throws ParsingException {
+			throws ParsingException {
 		final Map<Option<?>, Object> values = new HashMap<Option<?>, Object>();
-		
+
 		command.getOptions();
 		Option<?> currentOption = null;
-		
-		for (String token : arguments){
+
+		for (String token : arguments) {
 			if (token.startsWith("-")) {
-				if (currentOption != null 
-					&& !values.containsKey(currentOption)
-					&& currentOption.requiresValue()
-				) {
+				if (currentOption != null && !values.containsKey(currentOption) && currentOption.requiresValue()) {
 					throw new IllegalArgumentException(
-						String.format("option %s requires a value", currentOption.getParamName())
-					);
-				} else if (currentOption != null
-					&& !values.containsKey(currentOption)
-					&& !currentOption.requiresValue()
-				) {
+							String.format("option %s requires a value", currentOption.getParamName()));
+				} else if (currentOption != null && !values.containsKey(currentOption)
+						&& !currentOption.requiresValue()) {
 					values.put(currentOption, null);
 				}
-				
+
 				String optionName = null;
 				if (token.charAt(1) == '-') {
-					//starts with --
+					// starts with --
 					optionName = token.substring(2);
 				} else {
-					//starts with -
+					// starts with -
 					optionName = token.substring(1);
 				}
-				
+
 				final Option<?> option = command.getOption(optionName);
 				if (option == null) {
 					throw new ParsingException(String.format("option % not found", optionName));
-				}else{
+				} else {
 					currentOption = option;
 				}
 			} else {
@@ -157,10 +155,11 @@ public abstract class CLIApplication {
 							List<String> valuesList = (List<String>) values.get(currentOption);
 							valuesList.add(token);
 						} else {
-							throw new ParsingException("option " + currentOption.getParamName() + " was already specified");
+							throw new ParsingException(
+									"option " + currentOption.getParamName() + " was already specified");
 						}
 					} else {
-						if (currentOption.isMultiple()){
+						if (currentOption.isMultiple()) {
 							values.put(currentOption, Arrays.asList(token));
 						} else {
 							values.put(currentOption, token);
@@ -169,56 +168,92 @@ public abstract class CLIApplication {
 				}
 			}
 		}
-		
-		//if there is the last option with no required value
+
+		// if there is the last option with no required value
 		if (currentOption != null && !values.containsKey(currentOption) && currentOption.requiresValue()) {
 			throw new ParsingException("option " + currentOption.getParamName() + " requires a value");
 		} else if (currentOption != null && !values.containsKey(currentOption) && !currentOption.requiresValue()) {
 			values.put(currentOption, null);
 		}
-		
-		//validate mandatory arguments and put defaults
-		for (Option<?> option : command.getOptions()){
+
+		// validate mandatory arguments and put defaults
+		for (Option<?> option : command.getOptions()) {
 			if (!option.isOptional() && !values.containsKey(option) && !(option instanceof DefaultValuedOption)) {
-				throw new ParsingException("option "+option.getParamName()+" is mandatory");
+				throw new ParsingException("option " + option.getParamName() + " is mandatory");
 			}
-			
-			//put default-values if not specified before
-			if (!values.containsKey(option) && ( (option instanceof DefaultValuedOption))){
+
+			// put default-values if not specified before
+			if (!values.containsKey(option) && ((option instanceof DefaultValuedOption))) {
 				values.put(option, ((DefaultValuedOption<?>) option).getDefaultValue());
 			}
 		}
-		
+
 		final Map<Option<?>, ParameterValue<?>> paramValues = new HashMap<Option<?>, ParameterValue<?>>();
 		for (Map.Entry<Option<?>, Object> parameterValue : values.entrySet()) {
 			final Object value = parameterValue.getValue();
 			final Option<?> key = parameterValue.getKey();
-			paramValues.put(key, 
-				key.isMultiple()?
-					new MultipleParameterValue((List<String>) value):
-					new SingleParameterValue((String) value)
-			);
+			paramValues.put(key, key.isMultiple() ? new MultipleParameterValue((List<String>) value)
+					: new SingleParameterValue((String) value));
 		}
-		
+
 		return paramValues;
 	}
-	
+
 	private void printCommandHelp(Command command) {
 		System.err.println("Command " + command.getName());
 		printUsage(command);
-		for (Option<?> option : command.getOptions()){
-			System.err.println(
-				"\t--" + option.getParamName() + "/-" + option.getShortName()
-				+ "\n\t\t" + option.getDescription()
-				+ ((option instanceof DefaultValuedOption)?" (default: " + ((DefaultValuedOption<?>)option).getDefaultValue()+")":"")
-				+ ((option.isMultiple())?". This option can be specified multiple times":"")
-			);
-		}		
+
+		Map<OptionCategory, Set<Option<?>>> optionsByCategory = new HashMap<>();
+		command.getOptions().forEach((option) -> {
+			option.getCategories().forEach((category) -> {
+				if (!optionsByCategory.containsKey(category)) {
+					optionsByCategory.put(category, new HashSet<>());
+				}
+				optionsByCategory.get(category).add(option);
+			});
+		});
+		
+		if (optionsByCategory.keySet().size() == 1
+				&& optionsByCategory.keySet().contains(OptionCategory.DEFAULT_CATEGORY)) {
+			// do not categorize options
+			for (Option<?> option : command.getOptions()) {
+				printOption(option);
+			}
+
+		} else {
+			// print options by category, first uncategorized ones (if any)
+			if (optionsByCategory.containsKey(OptionCategory.DEFAULT_CATEGORY)) {
+				System.err.println("\tGeneral options:");
+				for (Option<?> option : optionsByCategory.get(OptionCategory.DEFAULT_CATEGORY)) {
+					printOption(option);
+				}
+				System.err.println();
+			}
+			optionsByCategory.remove(OptionCategory.DEFAULT_CATEGORY);
+
+			optionsByCategory.forEach((category, options) -> {
+				System.err.println("\t" + category.getName() + ":");
+				for (Option<?> option : options) {
+					printOption(option);
+				}
+				System.err.println();
+			});
+		}
+
 	}
-	
+
+	private void printOption(Option<?> option) {
+		System.err.println(
+				"\t--" + option.getParamName() + "/-" + option.getShortName() + "\n\t\t" + option.getDescription()
+						+ ((option instanceof DefaultValuedOption)
+								? " (default: " + ((DefaultValuedOption<?>) option).getDefaultValue() + ")"
+								: "")
+						+ ((option.isMultiple()) ? ". This option can be specified multiple times" : ""));
+	}
+
 	private void printUsage(Command command) {
 		System.err.print("usage: " + this.getApplicationCommand() + " " + command.getName());
-		
+
 		for (Option<?> option : command.getOptions()) {
 			if (option.isOptional()) {
 				System.err.print(" [");
@@ -236,26 +271,28 @@ public abstract class CLIApplication {
 			}
 		}
 		System.err.println();
-		
+
 	}
+
 	private void printHelp() {
 		printWelcome();
 		System.err.println("usage: " + this.getApplicationCommand() + " <command> [options]");
-		
+
 		System.err.println("where <command> is one of:");
-		for (Command option : listCommands()){
-			System.err.println("\t" + option.getName() + "\n\t\t" + option.getDescription());
+		for (Command command : listCommands()) {
+			System.err.println("\t" + command.getName() + "\n\t\t" + command.getDescription());
 		}
-		
+
 		if (this.isShowApplicationCommandInHelp()) {
-			System.err.println("Write '" + this.getApplicationCommand() + " help <command>' to see command-specific help");
+			System.err.println(
+					"Write '" + this.getApplicationCommand() + " help <command>' to see command-specific help");
 		} else {
 			System.err.println("Write 'help <command>' to see command-specific help");
 		}
 	}
-	
+
 	private void printWelcome() {
-		System.err.println("Welcome to "+this.getApplicationName());
+		System.err.println("Welcome to " + this.getApplicationName());
 		System.err.println(this.getDescription());
 	}
 }

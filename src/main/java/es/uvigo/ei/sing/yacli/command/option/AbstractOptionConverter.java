@@ -7,6 +7,7 @@ import es.uvigo.ei.sing.yacli.command.parameter.MultipleParameterValue;
 import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
 public abstract class AbstractOptionConverter<T> implements OptionConverter<T> {
+	
 	@Override
 	public List<T> convert(MultipleParameterValue mpv) {
 		if (mpv == null) {

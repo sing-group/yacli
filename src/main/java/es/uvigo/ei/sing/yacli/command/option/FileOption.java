@@ -22,6 +22,7 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
 import java.io.File;
+import java.util.List;
 
 
 public class FileOption extends StringConstructedOption<File> {
@@ -34,5 +35,20 @@ public class FileOption extends StringConstructedOption<File> {
 	public FileOption(String paramName, String shortName,
 			String description, boolean optional, boolean requiresValue) {
 		super(paramName, shortName, description, optional, requiresValue);
+	}
+	
+	public FileOption(
+			List<OptionCategory> categories,
+			String paramName, String shortName,
+			String description, boolean optional, boolean requiresValue,
+			boolean isMultiple) {
+		super(categories, paramName, shortName, description, optional, requiresValue, isMultiple);
+	}
+	
+	public FileOption(
+			List<OptionCategory> categories,
+			String paramName, String shortName,
+			String description, boolean optional, boolean requiresValue) {
+		super(categories, paramName, shortName, description, optional, requiresValue);
 	}
 }

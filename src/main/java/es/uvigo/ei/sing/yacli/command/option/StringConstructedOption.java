@@ -1,6 +1,7 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
@@ -44,6 +45,50 @@ public abstract class StringConstructedOption<T> extends Option<T> {
 		
 		this.getConverter().setTargetClass(this.getParamClass());
 	}
+	
+	public StringConstructedOption(
+			List<OptionCategory> categories,
+			String paramName, 
+			String shortName, 
+			String description,
+			boolean optional, 
+			boolean requiresValue, 
+			boolean isMultiple
+		) {
+			super(
+				categories,
+				paramName, 
+				shortName, 
+				description, 
+				optional, 
+				requiresValue, 
+				isMultiple, 
+				new StringConstructedConverter<T>()
+			);
+
+			this.getConverter().setTargetClass(this.getParamClass());
+		}
+
+		public StringConstructedOption(
+			List<OptionCategory> categories,
+			String paramName, 
+			String shortName, 
+			String description,
+			boolean optional, 
+			boolean requiresValue
+		) {
+			super(
+				categories,
+				paramName, 
+				shortName, 
+				description, 
+				optional, 
+				requiresValue, 
+				new StringConstructedConverter<T>()
+			);
+			
+			this.getConverter().setTargetClass(this.getParamClass());
+		}
 	
 	@Override
 	public StringConstructedConverter<T> getConverter() {

@@ -1,5 +1,8 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
+import java.util.Arrays;
+import java.util.List;
+
 import es.uvigo.ei.sing.yacli.command.parameter.MultipleParameterValue;
 import es.uvigo.ei.sing.yacli.command.parameter.ParameterValue;
 import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
@@ -12,8 +15,10 @@ public class Option<T> {
 	private final boolean requiresValue;
 	private final boolean isMultiple;
 	private final OptionConverter<T> converter;
-
+	private final List<OptionCategory> categories;
+	
 	public Option(
+			List<OptionCategory> categories,
 			String paramName,
 			String shortName,
 			String description,
@@ -23,6 +28,7 @@ public class Option<T> {
 			OptionConverter<T> converter
 	) {
 		super();
+		this.categories = categories;
 		this.paramName = paramName;
 		this.shortName = shortName;
 		this.description = description;
@@ -33,6 +39,7 @@ public class Option<T> {
 	}
 
 	public Option(
+			List<OptionCategory> categories,
 			String paramName,
 			String shortName,
 			String description,
@@ -40,9 +47,36 @@ public class Option<T> {
 			boolean requiresValue,
 			OptionConverter<T> converter
 	) {
-		this(paramName, shortName, description, optional, requiresValue, false, converter);
+		this(categories, paramName, shortName, description, optional, requiresValue, false, converter);
 	}
 
+	public Option(
+			String paramName,
+			String shortName,
+			String description,
+			boolean optional,
+			boolean requiresValue,
+			boolean isMultiple,
+			OptionConverter<T> converter
+	) {
+		this(Arrays.asList(OptionCategory.DEFAULT_CATEGORY), paramName, shortName, description, optional, requiresValue, isMultiple, converter);
+	}
+
+	public Option(
+			String paramName,
+			String shortName,
+			String description,
+			boolean optional,
+			boolean requiresValue,
+			OptionConverter<T> converter
+	) {
+		this(Arrays.asList(OptionCategory.DEFAULT_CATEGORY), paramName, shortName, description, optional, requiresValue, converter);
+	}
+	
+	public List<OptionCategory> getCategories() {
+		return categories;
+	}
+	
 	public String getParamName() {
 		return paramName;
 	}

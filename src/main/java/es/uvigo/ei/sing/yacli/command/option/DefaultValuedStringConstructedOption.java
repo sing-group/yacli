@@ -1,6 +1,7 @@
 package es.uvigo.ei.sing.yacli.command.option;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 import es.uvigo.ei.sing.yacli.command.option.StringConstructedOption.StringConstructedConverter;
 
@@ -15,6 +16,19 @@ public class DefaultValuedStringConstructedOption<T> extends DefaultValuedOption
 			new StringConstructedOption.StringConstructedConverter<T>()
 		);
 
+		this.getConverter().setTargetClass(this.getParamClass());
+	}
+	public DefaultValuedStringConstructedOption(
+			List<OptionCategory> categories,
+			String paramName,
+			String shortName,
+			String description,
+			String defaultValue
+			) {
+		super(categories, paramName, shortName, description, defaultValue, 
+				new StringConstructedOption.StringConstructedConverter<T>()
+				);
+		
 		this.getConverter().setTargetClass(this.getParamClass());
 	}
 	

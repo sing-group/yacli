@@ -21,6 +21,8 @@
  */
 package es.uvigo.ei.sing.yacli.command.option;
 
+import java.util.List;
+
 public class IntegerOption extends DefaultValuedStringConstructedOption<Integer> {
 	public IntegerOption(
 		String paramName, String shortName,
@@ -34,5 +36,20 @@ public class IntegerOption extends DefaultValuedStringConstructedOption<Integer>
 		String description, String defaultValue
 	) {
 		this(paramName, shortName, description, Integer.valueOf(defaultValue));
+	}
+	public IntegerOption(
+			List<OptionCategory> categories,
+			String paramName, String shortName,
+			String description, Integer defaultValue
+			) {
+		super(categories, paramName, shortName, description, defaultValue.toString());
+	}
+	
+	public IntegerOption(
+			List<OptionCategory> categories,
+			String paramName, String shortName,
+			String description, String defaultValue
+			) {
+		this(categories, paramName, shortName, description, Integer.valueOf(defaultValue));
 	}
 }

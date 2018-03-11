@@ -21,6 +21,8 @@
  */
 package es.uvigo.ei.sing.yacli.command.option;
 
+import java.util.List;
+
 import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
 public class BooleanOption extends Option<Boolean> {
@@ -43,6 +45,29 @@ public class BooleanOption extends Option<Boolean> {
 		boolean requiresValue
 	) {
 		super(paramName, shortName, description, optional, requiresValue, new BooleanConverter());
+	}
+	
+	public BooleanOption(
+			List<OptionCategory> categories,
+			String paramName,
+			String shortName,
+			String description,
+			boolean optional,
+			boolean requiresValue,
+			boolean isMultiple
+			) {
+		super(categories, paramName, shortName, description, optional, requiresValue, isMultiple, new BooleanConverter());
+	}
+	
+	public BooleanOption(
+			List<OptionCategory> categories,
+			String paramName,
+			String shortName,
+			String description,
+			boolean optional,
+			boolean requiresValue
+			) {
+		super(categories, paramName, shortName, description, optional, requiresValue, new BooleanConverter());
 	}
 	
 	protected static class BooleanConverter extends AbstractOptionConverter<Boolean> {

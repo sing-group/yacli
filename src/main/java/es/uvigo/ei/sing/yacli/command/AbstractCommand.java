@@ -17,7 +17,6 @@ public abstract class AbstractCommand implements Command {
 		return Collections.unmodifiableList(options);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> Option<T> getOption(String name) {
 		for (Option<?> option : this.getOptions()) {

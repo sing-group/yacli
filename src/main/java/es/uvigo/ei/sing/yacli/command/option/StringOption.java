@@ -26,6 +26,28 @@ public class StringOption extends Option<String> {
 	) {
 		super(paramName, shortName, description, optional, requiresValue, new StringOptionConverter());
 	}
+	public StringOption(
+			List<OptionCategory> categories,
+			String paramName, 
+			String shortName, 
+			String description,
+			boolean optional, 
+			boolean requiresValue, 
+			boolean isMultiple
+			) {
+		super(categories, paramName, shortName, description, optional, requiresValue, isMultiple, new StringOptionConverter());
+	}
+	
+	public StringOption(
+			List<OptionCategory> categories,
+			String paramName, 
+			String shortName, 
+			String description,
+			boolean optional, 
+			boolean requiresValue
+			) {
+		super(categories, paramName, shortName, description, optional, requiresValue, new StringOptionConverter());
+	}
 	
 	@Override
 	public StringOptionConverter getConverter() {

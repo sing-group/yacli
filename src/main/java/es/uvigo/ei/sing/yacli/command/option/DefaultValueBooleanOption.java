@@ -21,6 +21,8 @@
  */
 package es.uvigo.ei.sing.yacli.command.option;
 
+import java.util.List;
+
 public class DefaultValueBooleanOption extends DefaultValuedOption<Boolean> {
 	public DefaultValueBooleanOption(
 		String paramName, 
@@ -29,5 +31,15 @@ public class DefaultValueBooleanOption extends DefaultValuedOption<Boolean> {
 		boolean value
 	) {
 		super(paramName, shortName, description, Boolean.toString(value), new BooleanOption.BooleanConverter());
+	}
+	
+	public DefaultValueBooleanOption(
+			List<OptionCategory> categories,
+			String paramName, 
+			String shortName,
+			String description, 
+			boolean value
+			) {
+		super(categories, paramName, shortName, description, Boolean.toString(value), new BooleanOption.BooleanConverter());
 	}
 }
