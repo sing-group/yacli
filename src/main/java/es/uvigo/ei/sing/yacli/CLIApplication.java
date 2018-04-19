@@ -29,6 +29,7 @@ public abstract class CLIApplication {
 	protected abstract String getApplicationCommand();
 
 	private boolean showApplicationCommandInHelp;
+	private boolean ignoreUnrecognizedOptions;
 
 	public CLIApplication() {
 		this(true, true);
@@ -39,9 +40,14 @@ public abstract class CLIApplication {
 	}
 
 	protected CLIApplication(boolean showApplicationCommandInHelp, boolean preloadCommands) {
+		this(showApplicationCommandInHelp, preloadCommands, false);
+	}
+
+	protected CLIApplication(boolean showApplicationCommandInHelp, boolean preloadCommands,
+			boolean ignoreUnrecognizedOptions) {
 		this.showApplicationCommandInHelp = showApplicationCommandInHelp;
 		this.commandsByName = new LinkedHashMap<>();
-
+		this.ignoreUnrecognizedOptions = ignoreUnrecognizedOptions;
 		if (preloadCommands) {
 			this.loadCommands();
 		}
@@ -120,7 +126,9 @@ public abstract class CLIApplication {
 
 		command.getOptions();
 		Option<?> currentOption = null;
-
+		
+		final Option<?> IGNORE_OPTION = new Option("--ignore--", "--ignore--", "--ignore--", false, false, null);
+		
 		for (String token : arguments) {
 			if (token.startsWith("-")) {
 				if (currentOption != null && !values.containsKey(currentOption) && currentOption.requiresValue()) {
@@ -142,7 +150,11 @@ public abstract class CLIApplication {
 
 				final Option<?> option = command.getOption(optionName);
 				if (option == null) {
-					throw new ParsingException(String.format("option % not found", optionName));
+					if (ignoreUnrecognizedOptions) {
+						currentOption = IGNORE_OPTION;
+					} else {
+						throw new ParsingException(String.format("option %s not found", optionName));
+					}
 				} else {
 					currentOption = option;
 				}
@@ -150,6 +162,9 @@ public abstract class CLIApplication {
 				if (currentOption == null) {
 					throw new ParsingException("unable to parse. You should specify an option before a value");
 				} else {
+					if (ignoreUnrecognizedOptions && currentOption == IGNORE_OPTION) {
+						continue;
+					}
 					if (values.containsKey(currentOption)) {
 						if (currentOption.isMultiple()) {
 							List<String> valuesList = (List<String>) values.get(currentOption);
@@ -212,7 +227,7 @@ public abstract class CLIApplication {
 				optionsByCategory.get(category).add(option);
 			});
 		});
-		
+
 		if (optionsByCategory.keySet().size() == 1
 				&& optionsByCategory.keySet().contains(OptionCategory.DEFAULT_CATEGORY)) {
 			// do not categorize options
