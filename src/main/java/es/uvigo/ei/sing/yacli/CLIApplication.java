@@ -1,5 +1,6 @@
 package es.uvigo.ei.sing.yacli;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -76,19 +77,20 @@ public abstract class CLIApplication {
 	}
 
 	public void run(String[] args) {
+	  PrintStream out = System.err;
 		if (args.length == 0) {
-			printHelp();
+			printHelp(out);
 		} else if (args[0].equalsIgnoreCase("help")) {
-			printWelcome();
+			printWelcome(out);
 
 			if (args.length >= 2) {
 				final Command command = commandsByName.get(args[1].toUpperCase());
 
 				if (command != null)
-					printCommandHelp(command);
+					printCommandHelp(command, out);
 				else {
-					System.err.println("Command " + args[1] + " not found");
-					printHelp();
+					out.println("Command " + args[1] + " not found");
+					printHelp(out);
 				}
 			}
 		} else { // run the command
@@ -104,16 +106,16 @@ public abstract class CLIApplication {
 					final Parameters parameters = new DefaultParameters(values);
 					command.execute(parameters);
 				} catch (ParsingException e) {
-					System.err.println("Error parsing command: " + e.getMessage());
-					printCommandHelp(command);
+				  System.err.println("Error parsing command: " + e.getMessage());
+					printCommandHelp(command, System.err);
 				} catch (Exception e) {
-					System.err.println("Error during execution: " + e.getMessage());
+				  System.err.println("Error during execution: " + e.getMessage());
 					e.printStackTrace();
 				}
 			} else {
-				System.err.println("Command " + args[0] + " not found");
+				out.println("Command " + args[0] + " not found");
 
-				printHelp();
+				printHelp(out);
 			}
 
 		}
@@ -127,7 +129,7 @@ public abstract class CLIApplication {
 		command.getOptions();
 		Option<?> currentOption = null;
 		
-		final Option<?> IGNORE_OPTION = new Option("--ignore--", "--ignore--", "--ignore--", false, false, null);
+		final Option<?> IGNORE_OPTION = new Option<String>("--ignore--", "--ignore--", "--ignore--", false, false, null);
 		
 		for (String token : arguments) {
 			if (token.startsWith("-")) {
@@ -214,11 +216,14 @@ public abstract class CLIApplication {
 		return paramValues;
 	}
 
-	private void printCommandHelp(Command command) {
-		System.err.println("Command " + command.getName());
-		printUsage(command);
+	protected void printCommandHelp(Command command, PrintStream out) {
+		out.println("Command " + command.getName());
+		printCommandUsage(command, out);
+		printCommandOptionsExtended(command, out);
+	}
 
-		Map<OptionCategory, Set<Option<?>>> optionsByCategory = new HashMap<>();
+  protected void printCommandOptionsExtended(Command command, PrintStream out) {
+    Map<OptionCategory, Set<Option<?>>> optionsByCategory = new HashMap<>();
 		command.getOptions().forEach((option) -> {
 			option.getCategories().forEach((category) -> {
 				if (!optionsByCategory.containsKey(category)) {
@@ -232,33 +237,32 @@ public abstract class CLIApplication {
 				&& optionsByCategory.keySet().contains(OptionCategory.DEFAULT_CATEGORY)) {
 			// do not categorize options
 			for (Option<?> option : command.getOptions()) {
-				printOption(option);
+				printOption(option, out);
 			}
 
 		} else {
 			// print options by category, first uncategorized ones (if any)
 			if (optionsByCategory.containsKey(OptionCategory.DEFAULT_CATEGORY)) {
-				System.err.println("\tGeneral options:");
+				out.println("\tGeneral options:");
 				for (Option<?> option : optionsByCategory.get(OptionCategory.DEFAULT_CATEGORY)) {
-					printOption(option);
+					printOption(option, out);
 				}
-				System.err.println();
+				out.println();
 			}
 			optionsByCategory.remove(OptionCategory.DEFAULT_CATEGORY);
 
 			optionsByCategory.forEach((category, options) -> {
-				System.err.println("\t" + category.getName() + ":");
+				out.println("\t" + category.getName() + ":");
 				for (Option<?> option : options) {
-					printOption(option);
+					printOption(option, out);
 				}
-				System.err.println();
+				out.println();
 			});
 		}
+  }
 
-	}
-
-	private void printOption(Option<?> option) {
-		System.err.println(
+	protected void printOption(Option<?> option, PrintStream out) {
+		out.println(
 				"\t--" + option.getParamName() + "/-" + option.getShortName() + "\n\t\t" + option.getDescription()
 						+ ((option instanceof DefaultValuedOption)
 								? " (default: " + ((DefaultValuedOption<?>) option).getDefaultValue() + ")"
@@ -266,48 +270,55 @@ public abstract class CLIApplication {
 						+ ((option.isMultiple()) ? ". This option can be specified multiple times" : ""));
 	}
 
-	private void printUsage(Command command) {
-		System.err.print("usage: " + this.getApplicationCommand() + " " + command.getName());
-
-		for (Option<?> option : command.getOptions()) {
-			if (option.isOptional()) {
-				System.err.print(" [");
-			} else {
-				System.err.print(" ");
-			}
-
-			System.err.print("-" + option.getShortName());
-			if (option.requiresValue()) {
-				System.err.print(" <" + option.getParamName() + ">");
-			}
-
-			if (option.isOptional()) {
-				System.err.print("]");
-			}
-		}
-		System.err.println();
+	protected void printCommandUsage(Command command, PrintStream out) {
+		printCommandUsageLine(command, out);
+		printCommandOptions(command, out);
+		out.println();
 
 	}
 
-	private void printHelp() {
-		printWelcome();
-		System.err.println("usage: " + this.getApplicationCommand() + " <command> [options]");
+  protected void printCommandUsageLine(Command command, PrintStream out) {
+    out.print("usage: " + this.getApplicationCommand() + " " + command.getName());
+  }
 
-		System.err.println("where <command> is one of:");
+  protected void printCommandOptions(Command command, PrintStream out) {
+    for (Option<?> option : command.getOptions()) {
+			if (option.isOptional()) {
+				out.print(" [");
+			} else {
+				out.print(" ");
+			}
+
+			out.print("-" + option.getShortName());
+			if (option.requiresValue()) {
+				out.print(" <" + option.getParamName() + ">");
+			}
+
+			if (option.isOptional()) {
+				out.print("]");
+			}
+		}
+  }
+
+  protected void printHelp(PrintStream out) {
+		printWelcome(out);
+		out.println("usage: " + this.getApplicationCommand() + " <command> [options]");
+
+		out.println("where <command> is one of:");
 		for (Command command : listCommands()) {
-			System.err.println("\t" + command.getName() + "\n\t\t" + command.getDescription());
+			out.println("\t" + command.getName() + "\n\t\t" + command.getDescription());
 		}
 
 		if (this.isShowApplicationCommandInHelp()) {
-			System.err.println(
+			out.println(
 					"Write '" + this.getApplicationCommand() + " help <command>' to see command-specific help");
 		} else {
-			System.err.println("Write 'help <command>' to see command-specific help");
+			out.println("Write 'help <command>' to see command-specific help");
 		}
 	}
 
-	private void printWelcome() {
-		System.err.println("Welcome to " + this.getApplicationName());
-		System.err.println(this.getDescription());
+	protected void printWelcome(PrintStream out) {
+		out.println("Welcome to " + this.getApplicationName());
+		out.println(this.getDescription());
 	}
 }
