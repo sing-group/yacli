@@ -21,26 +21,48 @@
  */
 package es.uvigo.ei.sing.yacli.command.option;
 
+import static java.lang.Integer.valueOf;
+
 import java.util.List;
 
-public class DefaultValueBooleanOption extends DefaultValuedOption<Boolean> {
+public class IntegerDefaultValuedStringConstructedOption
+	extends DefaultValuedStringConstructedOption<Integer> {
 
-	public DefaultValueBooleanOption(
+	public IntegerDefaultValuedStringConstructedOption(
 		String paramName, 
 		String shortName,
 		String description, 
-		boolean value
+		Integer defaultValue
 	) {
-		super(paramName, shortName, description, Boolean.toString(value), new BooleanOption.BooleanConverter());
+		super(paramName, shortName, description, defaultValue.toString());
 	}
 	
-	public DefaultValueBooleanOption(
+	public IntegerDefaultValuedStringConstructedOption(
+		String paramName, 
+		String shortName,
+		String description, 
+		String defaultValue
+	) {
+		this(paramName, shortName, description, valueOf(defaultValue));
+	}
+
+	public IntegerDefaultValuedStringConstructedOption(
 		List<OptionCategory> categories,
 		String paramName, 
 		String shortName,
 		String description, 
-		boolean value
+		Integer defaultValue
 	) {
-		super(categories, paramName, shortName, description, Boolean.toString(value), new BooleanOption.BooleanConverter());
+		super(categories, paramName, shortName, description, defaultValue.toString());
+	}
+	
+	public IntegerDefaultValuedStringConstructedOption(
+		List<OptionCategory> categories,
+		String paramName, 
+		String shortName,
+		String description, 
+		String defaultValue
+	) {
+		this(categories, paramName, shortName, description, valueOf(defaultValue));
 	}
 }

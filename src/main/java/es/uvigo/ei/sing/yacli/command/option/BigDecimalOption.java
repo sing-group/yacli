@@ -24,22 +24,66 @@ package es.uvigo.ei.sing.yacli.command.option;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class BigDecimalOption extends DefaultValuedStringConstructedOption<BigDecimal> {
-	public BigDecimalOption(String paramName, String shortName, String description, BigDecimal defaultValue) {
-		super(paramName, shortName, description, defaultValue.toPlainString());
+import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
+
+public class BigDecimalOption extends Option<BigDecimal> {
+
+	public BigDecimalOption(
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional,
+		boolean isMultiple
+	) {
+		super(paramName, shortName, description, optional, true, isMultiple, new BigDecimalConverter());
 	}
 
-	public BigDecimalOption(String paramName, String shortName, String description, String defaultValue) {
-		this(paramName, shortName, description, new BigDecimal(defaultValue));
+	public BigDecimalOption(
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional
+	) {
+		super(paramName, shortName, description, optional, true, new BigDecimalConverter());
 	}
-
-	public BigDecimalOption(List<OptionCategory> categories, String paramName, String shortName, String description,
-			BigDecimal defaultValue) {
-		super(categories, paramName, shortName, description, defaultValue.toPlainString());
+	
+	public BigDecimalOption(
+		List<OptionCategory> categories,
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional,
+		boolean isMultiple
+	) {
+		super(categories, paramName, shortName, description, optional, true, isMultiple, new BigDecimalConverter());
 	}
+	
+	public BigDecimalOption(
+		List<OptionCategory> categories,
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional
+	) {
+		super(categories, paramName, shortName, description, optional, true, new BigDecimalConverter());
+	}
+	
+	protected static class BigDecimalConverter extends AbstractOptionConverter<BigDecimal> {
+		@Override
+		public Class<BigDecimal> getTargetClass() {
+			return BigDecimal.class;
+		}
 
-	public BigDecimalOption(List<OptionCategory> categories, String paramName, String shortName, String description,
-			String defaultValue) {
-		this(categories, paramName, shortName, description, new BigDecimal(defaultValue));
+		@Override
+		public boolean canConvert(SingleParameterValue value) {
+			return true;
+		}
+
+		@Override
+		public BigDecimal convert(SingleParameterValue spv) {
+			final String value = spv.getValue();
+
+			return new BigDecimal(value);
+		}
 	}
 }

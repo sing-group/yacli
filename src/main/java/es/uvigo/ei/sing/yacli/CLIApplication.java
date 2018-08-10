@@ -1,19 +1,18 @@
 package es.uvigo.ei.sing.yacli;
 
+import static es.uvigo.ei.sing.yacli.command.CommandPrinter.printCommandOptionsExtended;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import es.uvigo.ei.sing.yacli.command.Command;
 import es.uvigo.ei.sing.yacli.command.option.DefaultValuedOption;
 import es.uvigo.ei.sing.yacli.command.option.Option;
-import es.uvigo.ei.sing.yacli.command.option.OptionCategory;
 import es.uvigo.ei.sing.yacli.command.parameter.DefaultParameters;
 import es.uvigo.ei.sing.yacli.command.parameter.MultipleParameterValue;
 import es.uvigo.ei.sing.yacli.command.parameter.ParameterValue;
@@ -220,54 +219,6 @@ public abstract class CLIApplication {
 		out.println("Command " + command.getName());
 		printCommandUsage(command, out);
 		printCommandOptionsExtended(command, out);
-	}
-
-  protected void printCommandOptionsExtended(Command command, PrintStream out) {
-    Map<OptionCategory, Set<Option<?>>> optionsByCategory = new HashMap<>();
-		command.getOptions().forEach((option) -> {
-			option.getCategories().forEach((category) -> {
-				if (!optionsByCategory.containsKey(category)) {
-					optionsByCategory.put(category, new HashSet<>());
-				}
-				optionsByCategory.get(category).add(option);
-			});
-		});
-
-		if (optionsByCategory.keySet().size() == 1
-				&& optionsByCategory.keySet().contains(OptionCategory.DEFAULT_CATEGORY)) {
-			// do not categorize options
-			for (Option<?> option : command.getOptions()) {
-				printOption(option, out);
-			}
-
-		} else {
-			// print options by category, first uncategorized ones (if any)
-			if (optionsByCategory.containsKey(OptionCategory.DEFAULT_CATEGORY)) {
-				out.println("\tGeneral options:");
-				for (Option<?> option : optionsByCategory.get(OptionCategory.DEFAULT_CATEGORY)) {
-					printOption(option, out);
-				}
-				out.println();
-			}
-			optionsByCategory.remove(OptionCategory.DEFAULT_CATEGORY);
-
-			optionsByCategory.forEach((category, options) -> {
-				out.println("\t" + category.getName() + ":");
-				for (Option<?> option : options) {
-					printOption(option, out);
-				}
-				out.println();
-			});
-		}
-  }
-
-	protected void printOption(Option<?> option, PrintStream out) {
-		out.println(
-				"\t--" + option.getParamName() + "/-" + option.getShortName() + "\n\t\t" + option.getDescription()
-						+ ((option instanceof DefaultValuedOption)
-								? " (default: " + ((DefaultValuedOption<?>) option).getDefaultValue() + ")"
-								: "")
-						+ ((option.isMultiple()) ? ". This option can be specified multiple times" : ""));
 	}
 
 	protected void printCommandUsage(Command command, PrintStream out) {

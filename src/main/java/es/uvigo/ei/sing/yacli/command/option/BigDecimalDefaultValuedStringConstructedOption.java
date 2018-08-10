@@ -21,26 +21,48 @@
  */
 package es.uvigo.ei.sing.yacli.command.option;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public class DefaultValueBooleanOption extends DefaultValuedOption<Boolean> {
+public class BigDecimalDefaultValuedStringConstructedOption
+	extends DefaultValuedStringConstructedOption<BigDecimal> {
 
-	public DefaultValueBooleanOption(
-		String paramName, 
-		String shortName,
+	public BigDecimalDefaultValuedStringConstructedOption(
+		String paramName,
+		String shortName, 
 		String description, 
-		boolean value
+		BigDecimal defaultValue
 	) {
-		super(paramName, shortName, description, Boolean.toString(value), new BooleanOption.BooleanConverter());
+		super(paramName, shortName, description, defaultValue.toPlainString());
 	}
-	
-	public DefaultValueBooleanOption(
-		List<OptionCategory> categories,
+
+	public BigDecimalDefaultValuedStringConstructedOption(
+		String paramName,
+		String shortName, 
+		String description, 
+		String defaultValue
+	) {
+		this(paramName, shortName, description, new BigDecimal(defaultValue));
+	}
+
+	public BigDecimalDefaultValuedStringConstructedOption(
+		List<OptionCategory> categories, 
 		String paramName, 
 		String shortName,
 		String description, 
-		boolean value
+		BigDecimal defaultValue
 	) {
-		super(categories, paramName, shortName, description, Boolean.toString(value), new BooleanOption.BooleanConverter());
+		super(categories, paramName, shortName, description,
+			defaultValue.toPlainString());
+	}
+
+	public BigDecimalDefaultValuedStringConstructedOption(
+		List<OptionCategory> categories, 
+		String paramName, 
+		String shortName,
+		String description, 
+		String defaultValue
+	) {
+		this(categories, paramName, shortName, description, new BigDecimal(defaultValue));
 	}
 }

@@ -23,33 +23,66 @@ package es.uvigo.ei.sing.yacli.command.option;
 
 import java.util.List;
 
-public class IntegerOption extends DefaultValuedStringConstructedOption<Integer> {
+import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
+
+public class IntegerOption extends Option<Integer> {
+
 	public IntegerOption(
-		String paramName, String shortName,
-		String description, Integer defaultValue
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional,
+		boolean isMultiple
 	) {
-		super(paramName, shortName, description, defaultValue.toString());
+		super(paramName, shortName, description, optional, true, isMultiple, new IntegerConverter());
+	}
+
+	public IntegerOption(
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional
+	) {
+		super(paramName, shortName, description, optional, true, new IntegerConverter());
 	}
 	
 	public IntegerOption(
-		String paramName, String shortName,
-		String description, String defaultValue
+		List<OptionCategory> categories,
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional,
+		boolean isMultiple
 	) {
-		this(paramName, shortName, description, Integer.valueOf(defaultValue));
-	}
-	public IntegerOption(
-			List<OptionCategory> categories,
-			String paramName, String shortName,
-			String description, Integer defaultValue
-			) {
-		super(categories, paramName, shortName, description, defaultValue.toString());
+		super(categories, paramName, shortName, description, optional, true, isMultiple, new IntegerConverter());
 	}
 	
 	public IntegerOption(
-			List<OptionCategory> categories,
-			String paramName, String shortName,
-			String description, String defaultValue
-			) {
-		this(categories, paramName, shortName, description, Integer.valueOf(defaultValue));
+		List<OptionCategory> categories,
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional
+	) {
+		super(categories, paramName, shortName, description, optional, true, new IntegerConverter());
+	}
+	
+	protected static class IntegerConverter extends AbstractOptionConverter<Integer> {
+		@Override
+		public Class<Integer> getTargetClass() {
+			return Integer.class;
+		}
+
+		@Override
+		public boolean canConvert(SingleParameterValue value) {
+			return true;
+		}
+
+		@Override
+		public Integer convert(SingleParameterValue spv) {
+			final String value = spv.getValue();
+
+			return Integer.valueOf(value);
+		}
 	}
 }

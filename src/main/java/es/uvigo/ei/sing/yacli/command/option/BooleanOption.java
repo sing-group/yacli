@@ -26,6 +26,7 @@ import java.util.List;
 import es.uvigo.ei.sing.yacli.command.parameter.SingleParameterValue;
 
 public class BooleanOption extends Option<Boolean> {
+
 	public BooleanOption(
 		String paramName,
 		String shortName,
@@ -48,25 +49,25 @@ public class BooleanOption extends Option<Boolean> {
 	}
 	
 	public BooleanOption(
-			List<OptionCategory> categories,
-			String paramName,
-			String shortName,
-			String description,
-			boolean optional,
-			boolean requiresValue,
-			boolean isMultiple
-			) {
+		List<OptionCategory> categories,
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional,
+		boolean requiresValue,
+		boolean isMultiple
+	) {
 		super(categories, paramName, shortName, description, optional, requiresValue, isMultiple, new BooleanConverter());
 	}
 	
 	public BooleanOption(
-			List<OptionCategory> categories,
-			String paramName,
-			String shortName,
-			String description,
-			boolean optional,
-			boolean requiresValue
-			) {
+		List<OptionCategory> categories,
+		String paramName,
+		String shortName,
+		String description,
+		boolean optional,
+		boolean requiresValue
+	) {
 		super(categories, paramName, shortName, description, optional, requiresValue, new BooleanConverter());
 	}
 	
@@ -84,7 +85,7 @@ public class BooleanOption extends Option<Boolean> {
 		@Override
 		public Boolean convert(SingleParameterValue spv) {
 			final String value = spv.getValue();
-			
+
 			if (value.equalsIgnoreCase("yes"))
 				return Boolean.TRUE;
 			else if (value.equalsIgnoreCase("no"))
