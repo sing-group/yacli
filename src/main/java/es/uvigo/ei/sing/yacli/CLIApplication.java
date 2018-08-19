@@ -1,6 +1,7 @@
 package es.uvigo.ei.sing.yacli;
 
 import static es.uvigo.ei.sing.yacli.command.CommandPrinter.printCommandOptionsExtended;
+import static java.lang.System.arraycopy;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -76,48 +77,55 @@ public abstract class CLIApplication {
 	}
 
 	public void run(String[] args) {
-	  PrintStream out = System.err;
+		PrintStream out = System.err;
 		if (args.length == 0) {
 			printHelp(out);
-		} else if (args[0].equalsIgnoreCase("help")) {
-			printWelcome(out);
-
+		} else if (isHelpArgument(args[0])) {
 			if (args.length >= 2) {
-				final Command command = commandsByName.get(args[1].toUpperCase());
+				final Command command = commandsByName
+					.get(args[1].toUpperCase());
 
-				if (command != null)
+				if (command != null) {
+					printWelcome(out);
 					printCommandHelp(command, out);
-				else {
+				} else {
 					out.println("Command " + args[1] + " not found");
 					printHelp(out);
 				}
+			} else {
+				printHelp(out);
 			}
-		} else { // run the command
+		} else {
 			final Command command = commandsByName.get(args[0].toUpperCase());
 
 			if (command != null) {
 				final String[] noFirst = new String[args.length - 1];
-				System.arraycopy(args, 1, noFirst, 0, noFirst.length);
+				arraycopy(args, 1, noFirst, 0, noFirst.length);
 
 				try {
-					final Map<Option<?>, ParameterValue<?>> values = parseCommand(command, noFirst);
+					final Map<Option<?>, ParameterValue<?>> values = 
+						parseCommand(command, noFirst);
 
 					final Parameters parameters = new DefaultParameters(values);
 					command.execute(parameters);
 				} catch (ParsingException e) {
-				  System.err.println("Error parsing command: " + e.getMessage());
-					printCommandHelp(command, System.err);
+					out.println("Error parsing command: " + e.getMessage());
+					printCommandHelp(command, out);
 				} catch (Exception e) {
-				  System.err.println("Error during execution: " + e.getMessage());
+					out.println("Error during execution: " + e.getMessage());
 					e.printStackTrace();
 				}
 			} else {
 				out.println("Command " + args[0] + " not found");
-
 				printHelp(out);
 			}
 
 		}
+	}
+
+	protected static boolean isHelpArgument(String arg) {
+		return arg.equalsIgnoreCase("help") || arg.equalsIgnoreCase("-h")
+			|| arg.equalsIgnoreCase("--help");
 	}
 
 	@SuppressWarnings("unchecked")
