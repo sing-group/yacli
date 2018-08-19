@@ -27,6 +27,8 @@ public abstract class CLIApplication {
 
 	protected abstract String getApplicationName();
 
+	protected abstract String getApplicationVersion();
+
 	protected abstract String getApplicationCommand();
 
 	private boolean showApplicationCommandInHelp;
@@ -40,12 +42,15 @@ public abstract class CLIApplication {
 		this(showApplicationCommandInHelp, true);
 	}
 
-	protected CLIApplication(boolean showApplicationCommandInHelp, boolean preloadCommands) {
+	protected CLIApplication(boolean showApplicationCommandInHelp,
+		boolean preloadCommands
+	) {
 		this(showApplicationCommandInHelp, preloadCommands, false);
 	}
 
-	protected CLIApplication(boolean showApplicationCommandInHelp, boolean preloadCommands,
-			boolean ignoreUnrecognizedOptions) {
+	protected CLIApplication(boolean showApplicationCommandInHelp,
+		boolean preloadCommands, boolean ignoreUnrecognizedOptions
+	) {
 		this.showApplicationCommandInHelp = showApplicationCommandInHelp;
 		this.commandsByName = new LinkedHashMap<>();
 		this.ignoreUnrecognizedOptions = ignoreUnrecognizedOptions;
@@ -80,6 +85,8 @@ public abstract class CLIApplication {
 		PrintStream out = System.err;
 		if (args.length == 0) {
 			printHelp(out);
+		} else if (isVersionArgument(args[0])) {
+			out.println(getApplicationVersion());
 		} else if (isHelpArgument(args[0])) {
 			if (args.length >= 2) {
 				final Command command = commandsByName
@@ -123,20 +130,26 @@ public abstract class CLIApplication {
 		}
 	}
 
+	protected static boolean isVersionArgument(String arg) {
+		return arg.equalsIgnoreCase("-v") || arg.equalsIgnoreCase("--version");
+	}
+
 	protected static boolean isHelpArgument(String arg) {
 		return arg.equalsIgnoreCase("help") || arg.equalsIgnoreCase("-h")
 			|| arg.equalsIgnoreCase("--help");
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<Option<?>, ParameterValue<?>> parseCommand(Command command, String[] arguments)
-			throws ParsingException {
+	private Map<Option<?>, ParameterValue<?>> parseCommand(Command command,
+		String[] arguments
+	) throws ParsingException {
 		final Map<Option<?>, Object> values = new HashMap<Option<?>, Object>();
 
 		command.getOptions();
 		Option<?> currentOption = null;
 		
-		final Option<?> IGNORE_OPTION = new Option<String>("--ignore--", "--ignore--", "--ignore--", false, false, null);
+		final Option<?> IGNORE_OPTION = new Option<String>(
+			"--ignore--", "--ignore--", "--ignore--", false, false, null);
 		
 		for (String token : arguments) {
 			if (token.startsWith("-")) {
