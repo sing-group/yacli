@@ -5,7 +5,6 @@ import static java.lang.System.arraycopy;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -197,7 +196,9 @@ public abstract class CLIApplication {
 						}
 					} else {
 						if (currentOption.isMultiple()) {
-							values.put(currentOption, Arrays.asList(token));
+							List<String> toAddValues = new ArrayList<>();
+							toAddValues.add(token);
+							values.put(currentOption, toAddValues);
 						} else {
 							values.put(currentOption, token);
 						}
