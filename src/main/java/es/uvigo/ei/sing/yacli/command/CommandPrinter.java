@@ -13,7 +13,13 @@ import es.uvigo.ei.sing.yacli.command.option.Option;
 import es.uvigo.ei.sing.yacli.command.option.OptionCategory;
 
 public class CommandPrinter {
-	public static void printCommandOptionsExtended(Command command, PrintStream out) {
+  public static void printCommandOptionsExtended(Command command, PrintStream out) {
+    printCommandOptionsExtended(command, out, new CommandPrinterConfiguration());
+  }
+
+  public static void printCommandOptionsExtended(
+    Command command, PrintStream out, CommandPrinterConfiguration configuration
+  ) {
 		Map<OptionCategory, Set<Option<?>>> optionsByCategory = new HashMap<>();
 		command.getOptions().forEach((option) -> {
 			option.getCategories().forEach((category) -> {
@@ -44,7 +50,9 @@ public class CommandPrinter {
 			optionsByCategory.remove(DEFAULT_CATEGORY);
 
 			optionsByCategory.forEach((category, options) -> {
-				out.println("\t" + category.getName() + ":");
+        if (configuration.isPrintCategoryName()) {
+          out.println("\t" + category.getName() + ":");
+        }
 				for (Option<?> option : options) {
 					printOption(option, out);
 				}
