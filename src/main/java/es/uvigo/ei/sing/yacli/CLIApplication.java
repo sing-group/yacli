@@ -80,7 +80,7 @@ public abstract class CLIApplication {
 		return "";
 	}
 
-	public void run(String[] args) {
+	public void run(String[] args) throws CLIApplicationException {
 		PrintStream out = System.err;
 		if (args.length == 0) {
 			printHelp(out);
@@ -114,21 +114,32 @@ public abstract class CLIApplication {
 
 					final Parameters parameters = new DefaultParameters(values);
 					command.execute(parameters);
-				} catch (ParsingException e) {
-					out.println("Error parsing command: " + e.getMessage());
-					printCommandHelp(command, out);
 				} catch (Exception e) {
-					out.println("Error during execution: " + e.getMessage());
-					e.printStackTrace();
+					handleCommandException(new CLIApplicationCommandException(command, e), out);
 				}
 			} else {
-				out.println("Command " + args[0] + " not found");
-				printHelp(out);
+				handleException(new CLIApplicationException(new IllegalArgumentException("Command " + args[0] + " not found")), out);
 			}
 
 		}
 	}
 
+	protected void handleCommandException(CLIApplicationCommandException exception, PrintStream out) {
+		if (exception.getCause() instanceof ParsingException) {
+			out.println("Error parsing command: " + exception.getCause().getMessage());
+			printCommandHelp(exception.getCommand(), out);
+			throw exception;
+		}
+		out.println("Error during execution: " + exception.getMessage());					
+		throw exception;
+	}
+
+	protected void handleException(CLIApplicationException exception, PrintStream out) {
+		out.println(exception.getMessage());
+		printHelp(out);
+		throw exception;
+	}
+	
 	protected static boolean isVersionArgument(String arg) {
 		return arg.equalsIgnoreCase("-v") || arg.equalsIgnoreCase("--version");
 	}

@@ -1,6 +1,6 @@
 package es.uvigo.ei.sing.yacli;
 
-class ParsingException extends Exception {
+class ParsingException extends CLIApplicationException {
 	private static final long serialVersionUID = 1L;
 
 	public ParsingException(String message) {
