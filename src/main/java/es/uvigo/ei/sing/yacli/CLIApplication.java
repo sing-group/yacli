@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.uvigo.ei.sing.yacli.command.Command;
+import es.uvigo.ei.sing.yacli.command.CommandPrinterConfiguration;
 import es.uvigo.ei.sing.yacli.command.option.DefaultValuedOption;
 import es.uvigo.ei.sing.yacli.command.option.Option;
 import es.uvigo.ei.sing.yacli.command.parameter.DefaultParameters;
@@ -29,9 +30,14 @@ public abstract class CLIApplication {
 	protected abstract String getApplicationVersion();
 
 	protected abstract String getApplicationCommand();
+	
+  protected CommandPrinterConfiguration getCommandPrinterConfiguration() {
+    return new CommandPrinterConfiguration();
+  };
 
 	private boolean showApplicationCommandInHelp;
 	private boolean ignoreUnrecognizedOptions;
+  private CommandPrinterConfiguration commandPrinterConfiguration;
 
 	public CLIApplication() {
 		this(true, true);
@@ -56,6 +62,7 @@ public abstract class CLIApplication {
 		if (preloadCommands) {
 			this.loadCommands();
 		}
+		this.commandPrinterConfiguration = getCommandPrinterConfiguration();
 	}
 
 	protected void loadCommands() {
@@ -93,7 +100,7 @@ public abstract class CLIApplication {
 
 				if (command != null) {
 					printWelcome(out);
-					printCommandHelp(command, out);
+					printCommandHelp(command, out, commandPrinterConfiguration);
 				} else {
 					out.println("Command " + args[1] + " not found");
 					printHelp(out);
@@ -127,7 +134,7 @@ public abstract class CLIApplication {
 	protected void handleCommandException(CLIApplicationCommandException exception, PrintStream out) {
 		if (exception.getCause() instanceof ParsingException) {
 			out.println("Error parsing command: " + exception.getCause().getMessage());
-			printCommandHelp(exception.getCommand(), out);
+			printCommandHelp(exception.getCommand(), out, commandPrinterConfiguration);
 			throw exception;
 		}
 		out.println("Error during execution: " + exception.getMessage());					
@@ -248,10 +255,10 @@ public abstract class CLIApplication {
 		return paramValues;
 	}
 
-	protected void printCommandHelp(Command command, PrintStream out) {
+	protected void printCommandHelp(Command command, PrintStream out, CommandPrinterConfiguration configuration) {
 		out.println("Command " + command.getName());
 		printCommandUsage(command, out);
-		printCommandOptionsExtended(command, out);
+		printCommandOptionsExtended(command, out, configuration);
 	}
 
 	protected void printCommandUsage(Command command, PrintStream out) {

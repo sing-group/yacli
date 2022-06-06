@@ -124,7 +124,7 @@ public class CommandOpionsTest {
 		throws UnsupportedEncodingException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(os);
-		CommandPrinter.printCommandOptionsExtended(c, ps);
+    CommandPrinter.printCommandOptionsExtended(c, ps, new CommandPrinterConfiguration());
 
 		return os.toString("UTF8");
 	}
