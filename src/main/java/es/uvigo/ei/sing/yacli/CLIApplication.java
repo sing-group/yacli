@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import es.uvigo.ei.sing.yacli.command.Command;
 import es.uvigo.ei.sing.yacli.command.CommandPrinterConfiguration;
@@ -262,33 +263,80 @@ public abstract class CLIApplication {
 	}
 
 	protected void printCommandUsage(Command command, PrintStream out) {
-		printCommandUsageLine(command, out);
 		printCommandOptions(command, out);
 		out.println();
-
 	}
 
-  protected void printCommandUsageLine(Command command, PrintStream out) {
-    out.print("usage: " + this.getApplicationCommand() + " " + command.getName());
+  protected void printCommandOptions(Command command, PrintStream out) {
+    StringBuilder sb = new StringBuilder("usage: ");
+
+    sb.append(this.getApplicationCommand());
+    sb.append(" ");
+    sb.append(command.getName());
+
+    for (Option<?> option : command.getOptions()) {
+      if (option.isOptional()) {
+        sb.append(" [");
+      } else {
+        sb.append(" ");
+      }
+
+      sb.append("-" + option.getShortName());
+      if (option.requiresValue()) {
+        sb.append(" <" + option.getParamName() + ">");
+      }
+
+      if (option.isOptional()) {
+        sb.append("]");
+      }
+    }
+
+    if (this.commandPrinterConfiguration.getBreakLines() == 0) {
+      out.print(sb.toString());
+    } else {
+      out.print(breakString(sb.toString(), this.commandPrinterConfiguration.getBreakLines(), "\t"));
+    }
   }
 
-  protected void printCommandOptions(Command command, PrintStream out) {
-    for (Option<?> option : command.getOptions()) {
-			if (option.isOptional()) {
-				out.print(" [");
-			} else {
-				out.print(" ");
-			}
+  private static String breakString(String text, int breakLines, String indent) {
+    List<String> toret = new ArrayList<String>();
 
-			out.print("-" + option.getShortName());
-			if (option.requiresValue()) {
-				out.print(" <" + option.getParamName() + ">");
-			}
+    StringBuilder currentString = new StringBuilder();
+    StringBuilder currentOption = new StringBuilder();
 
-			if (option.isOptional()) {
-				out.print("]");
-			}
-		}
+    for (int i = 0; i < text.length(); i++) {
+      char current = text.charAt(i);
+      if (current != ' ') {
+        currentOption.append(current);
+      } else {
+        if (i + 1 < text.length() && text.charAt(i + 1) == '<') {
+          currentOption.append(current);
+        } else {
+          if (currentString.length() + currentOption.length() + 1 < breakLines) {
+            currentString.append(currentOption).append(" ");
+            currentOption = new StringBuilder();
+          } else {
+            toret.add(currentString.toString());
+            currentString = new StringBuilder(indent);
+            currentString.append(currentOption).append(" ");
+            currentOption = new StringBuilder();
+          }
+        }
+      }
+    }
+
+    if (currentString.length() + currentOption.length() + 1 < breakLines) {
+      currentString.append(currentOption).append(" ");
+    } else {
+      toret.add(currentString.toString());
+      currentString = new StringBuilder(indent);
+      currentString.append(currentOption).append(" ");
+    }
+    if (currentString.length() > 0) {
+      toret.add(currentString.toString());
+    }
+
+    return toret.stream().collect(Collectors.joining("\n"));
   }
 
   protected void printHelp(PrintStream out) {
