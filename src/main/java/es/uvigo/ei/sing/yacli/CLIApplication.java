@@ -340,21 +340,28 @@ public abstract class CLIApplication {
   }
 
   protected void printHelp(PrintStream out) {
-		printWelcome(out);
-		out.println("usage: " + this.getApplicationCommand() + " <command> [options]");
+    printWelcome(out);
+    out.println("usage: " + this.getApplicationCommand() + " <command> [options]");
 
-		out.println("where <command> is one of:");
-		for (Command command : listCommands()) {
-			out.println("\t" + command.getName() + "\n\t\t" + command.getDescription());
-		}
+    printCommandsInHelp(out, listCommands());
 
-		if (this.isShowApplicationCommandInHelp()) {
-			out.println(
-					"Write '" + this.getApplicationCommand() + " help <command>' to see command-specific help");
-		} else {
-			out.println("Write 'help <command>' to see command-specific help");
-		}
-	}
+    if (this.isShowApplicationCommandInHelp()) {
+      out.println("Write '" + this.getApplicationCommand() + " help <command>' to see command-specific help");
+    } else {
+      out.println("Write 'help <command>' to see command-specific help");
+    }
+  }
+
+  protected void printCommandsInHelp(PrintStream out, List<Command> commands) {
+    out.println("where <command> is one of:");
+    for (Command command : listCommands()) {
+      printCommandInHelp(out, command);
+    }
+  }
+
+  protected void printCommandInHelp(PrintStream out, Command command) {
+    out.println("\t" + command.getName() + "\n\t\t" + command.getDescription());
+  }
 
 	protected void printWelcome(PrintStream out) {
 		out.println("Welcome to " + this.getApplicationName());
