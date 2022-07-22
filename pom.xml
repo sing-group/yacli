@@ -7,11 +7,28 @@
 	<packaging>jar</packaging>
 	<version>2.2.0-SNAPSHOT</version>
 	<name>Yast Another Command Line Interface library</name>
+	<inceptionYear>2015</inceptionYear>
+    
+	<licenses>
+		<license>
+			<name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		
+        
+		<license-maven-plugin.version>1.8</license-maven-plugin.version>
+
+		<!-- License configuration -->
+		<license.licenseName>gpl_v3</license.licenseName>
+		<license.copyrightOwners>Daniel Glez-Peña, Hugo López-Fernández, and Miguel Reboiro-Jato</license.copyrightOwners>
+		<license.organizationName>SING Research Group (Universidade de Vigo)</license.organizationName>
+		<license.addJavaLicenseAfterPackage>false</license.addJavaLicenseAfterPackage>
+
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		
@@ -81,6 +98,21 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${license-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+					</execution>
+				</executions>
+			</plugin>	
 		</plugins>
 	</build>
 </project>
